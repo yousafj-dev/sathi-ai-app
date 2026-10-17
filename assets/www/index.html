@@ -783,6 +783,7 @@
         showToast(event.target.checked ? 'Taza maloomat mode on — demo' : 'Taza maloomat mode off');
       });
       document.getElementById('micButton').addEventListener('click', function () {
+        if (window.SathiVoice) { SathiVoice.postMessage('start'); return; }
         var button = this;
         button.classList.add('listening');
         button.textContent = '●';
@@ -798,6 +799,23 @@
       document.getElementById('chatWindow').addEventListener('click', function (event) {
         var button = event.target.closest('[data-listen]');
         if (!button) return;
+        if (window.SathiTts) {
+          if (button.classList.contains('playing')) {
+            SathiTts.postMessage('__STOP__');
+            button.classList.remove('playing');
+            button.textContent = '▷ Sunno';
+            return;
+          }
+          var bubble = button.closest('.bubble');
+          var clone = bubble ? bubble.cloneNode(true) : null;
+          if (clone) clone.querySelectorAll('button, small').forEach(function (n) { n.remove(); });
+          var text = clone ? clone.textContent.replace(/\s+/g, ' ').trim() : '';
+          if (!text) { showToast('Sunne ke liye koi jawab nahi'); return; }
+          button.classList.add('playing');
+          button.textContent = '◼ Roko';
+          SathiTts.postMessage(text);
+          return;
+        }
         button.classList.add('playing');
         button.textContent = '◼ Sun raha hain…';
         showToast('Demo voice playback');
@@ -1030,5 +1048,55 @@
       }
     })();
   </script>
+<script>
+/* Sathi AI native bridge: mic state, input injection, share buttons for AI replies */
+(function () {
+  window.__sathiMicState = function (state) {
+    var b = document.getElementById('micButton');
+    if (!b) return;
+    if (state === 'listening') {
+      b.classList.add('listening');
+      b.textContent = '●';
+      document.getElementById('chatInput').placeholder = 'Sun raha hoon…';
+    } else {
+      b.classList.remove('listening');
+      b.textContent = '♬';
+      document.getElementById('chatInput').placeholder = 'Sawal likho...';
+    }
+  };
+  window.__sathiSetInput = function (text) {
+    var i = document.getElementById('chatInput');
+    if (i) { i.value = text; i.focus(); }
+    if (window.showToast) showToast('Apna sawal check kar ke Bhejo dabain');
+  };
+  function bubbleText(bubble) {
+    var clone = bubble.cloneNode(true);
+    clone.querySelectorAll('button, small').forEach(function (n) { n.remove(); });
+    return (clone.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+  function addShareButtons() {
+    document.querySelectorAll('.bubble.bot').forEach(function (b) {
+      if (b.querySelector('[data-sathi-share]')) return;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'listen-btn';
+      btn.setAttribute('data-sathi-share', '1');
+      btn.textContent = '⤴ Share';
+      btn.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var text = bubbleText(b);
+        if (window.SathiShare && text) SathiShare.postMessage(text);
+        else if (window.showToast) showToast('Share ke liye koi jawab nahi');
+      });
+      b.appendChild(btn);
+    });
+  }
+  addShareButtons();
+  var cw = document.getElementById('chatWindow');
+  if (cw && window.MutationObserver) {
+    new MutationObserver(addShareButtons).observe(cw, { childList: true, subtree: true });
+  }
+})();
+</script>
 </body>
 </html>

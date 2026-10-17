@@ -1,7 +1,7 @@
 name: sathi_ai_app
 description: "Sathi AI - Your Personal AI. Jo apki har kaam me help kare as a helper."
 publish_to: "none"
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
@@ -10,6 +10,14 @@ dependencies:
   flutter:
     sdk: flutter
   webview_flutter: ^4.8.0
+  # Native features (Play Store minimum-functionality)
+  speech_to_text: ^7.0.0        # mic voice input (native STT)
+  flutter_tts: ^4.2.0           # sunno - AI replies spoken aloud
+  share_plus: ^10.1.2           # share AI answers via Android share sheet
+  flutter_local_notifications: ^18.0.1  # daily Roman Urdu tips
+  timezone: ^0.9.4              # scheduling for daily tips
+  connectivity_plus: ^6.1.0     # offline detection
+  permission_handler: ^11.0.0   # mic + notification runtime permissions
 
 dev_dependencies:
   flutter_test:
