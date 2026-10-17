@@ -41,6 +41,5 @@ jobs:
           body: |
             Test build of Sathi AI - Your Personal AI.
             Install steps: download the APK below and install it on your phone.
-            Note: this build wraps the Sathi AI demo - AI chat replies are
-            sample responses, not live AI yet.
+            Note: AI chat uses live AI (free tier) - replies may take a few seconds.
           files: build/app/outputs/flutter-apk/app-release.apk
