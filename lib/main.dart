@@ -67,6 +67,8 @@ Future<void> _scheduleDailyTip() async {
       ),
       // inexact = no special exact-alarm permission needed
       androidScheduleMode: AndroidScheduleMode.inexact,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   } catch (_) {
