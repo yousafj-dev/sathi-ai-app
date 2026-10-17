@@ -374,6 +374,14 @@
     .switch button { border: 0; background: transparent; padding: 9px 6px; border-radius: 9px; cursor: pointer; font-size: 11px; color: var(--muted); }
     .switch button.active { background: linear-gradient(135deg, var(--surface-solid), var(--gold-soft)); box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 12%, transparent); color: var(--text); font-weight: 800; }
     .sample-label { display: inline-block; background: var(--warn-bg); color: var(--warn-text); font-size: 9px; font-weight: 800; padding: 4px 6px; border-radius: 6px; margin-bottom: 8px; }
+    .live-badge { display: inline-block; background: var(--success); color: #fff; font-size: 9px; font-weight: 800; padding: 4px 7px; border-radius: 6px; margin-bottom: 8px; letter-spacing: .4px; }
+    .ai-loading { display: flex; align-items: center; gap: 10px; padding: 16px 6px; color: var(--muted); font-size: 14px; }
+    .ai-spinner { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--primary); animation: ai-spin .8s linear infinite; flex: none; }
+    @keyframes ai-spin { to { transform: rotate(360deg); } }
+    .ai-error { padding: 14px; color: var(--warn-text); background: var(--warn-bg); border-radius: 10px; font-size: 14px; line-height: 1.5; }
+    .mcq-opts { list-style: none; padding: 0; margin: 8px 0; }
+    .mcq-opts li { padding: 5px 0; font-size: 14px; }
+    .gen-image { max-width: 100%; border-radius: 12px; display: block; margin: 8px 0; }
     .history-item { display: grid; grid-template-columns: 38px 1fr auto; gap: 10px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
     .history-item:last-child { border-bottom: 0; }
     .history-icon { width: 38px; height: 38px; display: grid; place-items: center; background: linear-gradient(145deg, var(--gold-soft), var(--primary-soft)); border: 1px solid color-mix(in srgb, var(--gold) 18%, transparent); border-radius: 11px; }
@@ -488,18 +496,18 @@
         <p>Your Personal AI — jo aapke har kaam me as a helper madad kare.</p>
       </header>
       <div class="section-head">
-        <div><h2>Quick tools</h2><p>Ek tool chuno aur demo try karo</p></div>
+        <div><h2>Quick tools</h2><p>Ek tool chuno aur try karo</p></div>
       </div>
       <div class="tool-grid">
         <button class="tool-card" data-open-tab="chat"><span class="tool-icon">💬</span><strong>AI Chat</strong><span>Apna sawal likho, foran jawab pao.</span></button>
         <button class="tool-card" data-tool="study"><span class="tool-icon">📚</span><strong>Study Helper</strong><span>Mushkil topic ko asaan alfaaz mein samjho.</span></button>
         <button class="tool-card" data-tool="cv"><span class="tool-icon">📄</span><strong>CV Maker</strong><span>Apni skills se saaf CV draft banao.</span></button>
         <button class="tool-card" data-tool="translator"><span class="tool-icon">🌐</span><strong>Translator</strong><span>English aur Roman Urdu mein tarjuma.</span></button>
-        <button class="tool-card" data-tool="image-create"><span class="tool-icon">◇</span><strong>Tasveer Banao</strong><span>Apne khayal se sample AI art preview.</span></button>
-        <button class="tool-card" data-tool="image-understand"><span class="tool-icon">⌁</span><strong>Tasveer Samjho</strong><span>Photo upload kar ke sample tajziya.</span></button>
+        <button class="tool-card" data-tool="image-create"><span class="tool-icon">◇</span><strong>Tasveer Banao</strong><span>Apne khayal se AI tasveer banao.</span></button>
+        <button class="tool-card" data-tool="image-understand"><span class="tool-icon">⌁</span><strong>Tasveer Samjho</strong><span>Photo upload karo (jald aa raha hai).</span></button>
         <button class="tool-card" data-tool="writing"><span class="tool-icon">✍️</span><strong>Writing Assistant</strong><span>Email, job message aur caption tayar karo.</span></button>
       </div>
-      <div class="demo-note"><span>ℹ️</span><span><strong>Demo version</strong> — asli AI abhi connect nahi hai. Private maloomat enter na karein.</span></div>
+      <div class="demo-note"><span>ℹ️</span><span><strong>Live AI</strong> — phir bhi bank/card jaisi private maloomat kabhi share na karein.</span></div>
       <article class="idea-card">
         <h3>Mera mashwara: pehle kya banana chahiye?</h3>
         <div class="priority"><b>1</b><p><strong>AI Chat + Study Helper</strong> ko live karo — Pakistan ke students ke liye yahi sab se strong starting point hai.</p></div>
@@ -509,14 +517,14 @@
     </section>
 
     <section class="screen" id="chat" aria-label="AI Chat">
-      <div class="page-head"><div class="head-icon">💬</div><div><h1>AI Chat</h1><p>Sawal likho, demo jawab dekho</p></div></div>
+      <div class="page-head"><div class="head-icon">💬</div><div><h1>AI Chat</h1><p>Sawal likho, live jawab pao</p></div></div>
       <div class="chat-window" id="chatWindow">
-        <div class="bubble bot">Hello friend! Main Sathi AI hoon — aapki parhai, CV aur rozana writing mein help kar sakta hoon.<small>Sathi AI · Demo</small><button class="listen-btn" type="button" data-listen>▷ Sunno</button></div>
+        <div class="bubble bot" data-say="Hello friend! Main Sathi AI hoon. Aapki parhai, CV aur rozana writing mein help kar sakta hoon.">Hello friend! Main Sathi AI hoon — aapki parhai, CV aur rozana writing mein help kar sakta hoon.<small>Sathi AI · Live</small><button class="listen-btn" type="button" data-listen>▷ Sunno</button></div>
       </div>
       <form class="chat-compose" id="chatForm">
         <div class="chat-options">
           <label class="web-toggle"><input id="webSearchToggle" type="checkbox"><span></span>Taza maloomat</label>
-          <small id="attachmentName">Demo chat</small>
+          <small id="attachmentName">Chat</small>
         </div>
         <div class="compose-row">
           <label class="icon-btn attach-btn" for="chatFile" aria-label="File attach karo" title="File attach karo">＋</label>
@@ -535,8 +543,8 @@
           <button class="tool-row" data-tool="study"><span class="tool-icon">📚</span><span><strong>Study Helper</strong><small>Explanation, key points aur MCQs</small></span><span class="arrow">›</span></button>
           <button class="tool-row" data-tool="cv"><span class="tool-icon">📄</span><span><strong>CV Maker</strong><small>Simple professional CV draft</small></span><span class="arrow">›</span></button>
           <button class="tool-row" data-tool="translator"><span class="tool-icon">🌐</span><span><strong>Translator</strong><small>English ↔ Roman Urdu</small></span><span class="arrow">›</span></button>
-          <button class="tool-row" data-tool="image-create"><span class="tool-icon">◇</span><span><strong>Tasveer Banao</strong><small>Prompt se sample AI art</small></span><span class="arrow">›</span></button>
-          <button class="tool-row" data-tool="image-understand"><span class="tool-icon">⌁</span><span><strong>Tasveer Samjho</strong><small>Photo ka sample tajziya</small></span><span class="arrow">›</span></button>
+          <button class="tool-row" data-tool="image-create"><span class="tool-icon">◇</span><span><strong>Tasveer Banao</strong><small>Prompt se AI tasveer</small></span><span class="arrow">›</span></button>
+          <button class="tool-row" data-tool="image-understand"><span class="tool-icon">⌁</span><span><strong>Tasveer Samjho</strong><small>Photo tajziya (jald aa raha hai)</small></span><span class="arrow">›</span></button>
           <button class="tool-row" data-tool="writing"><span class="tool-icon">✍️</span><span><strong>Writing Assistant</strong><small>Email, job message, caption</small></span><span class="arrow">›</span></button>
         </div>
       </div>
@@ -577,7 +585,7 @@
       </div>
 
       <div class="tool-view" id="tool-image-create">
-        <div class="page-head"><button class="back-btn" data-back-tools aria-label="Back">‹</button><div><h1>Tasveer Banao</h1><p>Khayal likho, sample AI art dekho</p></div></div>
+        <div class="page-head"><button class="back-btn" data-back-tools aria-label="Back">‹</button><div><h1>Tasveer Banao</h1><p>Khayal likho, AI tasveer dekho</p></div></div>
         <form class="panel" id="imageCreateForm">
           <div class="field"><label for="imagePrompt">TASVEER KA KHAYAL</label><textarea id="imagePrompt" placeholder="Misal: Raat ko Minar-e-Pakistan, futuristic neon style" required></textarea></div>
           <button class="btn full" type="submit">Tasveer Banao</button>
@@ -586,7 +594,7 @@
       </div>
 
       <div class="tool-view" id="tool-image-understand">
-        <div class="page-head"><button class="back-btn" data-back-tools aria-label="Back">‹</button><div><h1>Tasveer Samjho</h1><p>Photo ka demo tajziya</p></div></div>
+        <div class="page-head"><button class="back-btn" data-back-tools aria-label="Back">‹</button><div><h1>Tasveer Samjho</h1><p>Photo tajziya</p></div></div>
         <form class="panel" id="imageUnderstandForm">
           <div class="field"><label for="understandPhoto">PHOTO UPLOAD KAREIN</label><input id="understandPhoto" class="file-input" type="file" accept="image/jpeg,image/png,image/webp" required /></div>
           <button class="btn full" type="submit">Tasveer Samjhao</button>
@@ -613,7 +621,7 @@
         <div class="history-item"><span class="history-icon">✍️</span><div><strong>Job application message</strong><span>14 Oct, 2:10 PM · Writing</span></div><button class="delete-btn" aria-label="Delete history item">🗑️</button></div>
         <div class="empty" id="historyEmpty">History abhi khaali hai.</div>
       </div>
-      <div class="demo-note"><span>🔒</span><span>Login ke baad asli history yahan save hogi. Demo delete sirf is session ke liye hai.</span></div>
+      <div class="demo-note"><span>🔒</span><span>History sirf is device par save hoti hai.</span></div>
     </section>
 
     <section class="screen" id="pricing" aria-label="Pricing">
@@ -732,6 +740,36 @@
       document.querySelectorAll('[data-tool]').forEach(function (btn) { btn.addEventListener('click', function () { openTool(btn.dataset.tool); }); });
       document.querySelectorAll('[data-back-tools]').forEach(function (btn) { btn.addEventListener('click', showToolsMenu); });
 
+      var AI_ERR = 'AI se rabta nahi ho saka, dobara koshish karo.';
+      function aiText(prompt) {
+        return fetch('https://text.pollinations.ai/' + encodeURIComponent(prompt), { cache: 'no-store' })
+          .then(function (res) { if (!res.ok) throw new Error('ai-http'); return res.text(); })
+          .then(function (t) { t = (t || '').trim(); if (!t) throw new Error('ai-empty'); return t; });
+      }
+      function formatAi(text) {
+        var h = escapeHtml(text);
+        h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        return h.replace(/\n/g, '<br>');
+      }
+      function aiLoadingHtml(msg) {
+        return '<div class="ai-loading"><span class="ai-spinner"></span><span>' + escapeHtml(msg || 'AI kaam kar raha hai\u2026') + '</span></div>';
+      }
+      function parseMcqs(text) {
+        var out = '', count = 0, m;
+        var re = /Q\s*\d+\s*:\s*([^\n]+)\nA\)\s*([^\n]+)\nB\)\s*([^\n]+)\nC\)\s*([^\n]+)\nD\)\s*([^\n]+)\nAnswer\s*:\s*([A-Da-d])/g;
+        var letters = { a: 0, b: 1, c: 2, d: 3 };
+        while ((m = re.exec(text)) && count < 5) {
+          count++;
+          var opts = [m[2].trim(), m[3].trim(), m[4].trim(), m[5].trim()];
+          var correct = opts[letters[m[6].toLowerCase()]] || opts[0];
+          out += '<div class="mcq"><p><strong>Q' + count + ':</strong> ' + escapeHtml(m[1].trim()) + '</p><ul class="mcq-opts">' +
+            opts.map(function (o, i) { return '<li>' + 'ABCD'.charAt(i) + ') ' + escapeHtml(o) + '</li>'; }).join('') +
+            '</ul><button type="button" class="reveal">Answer dekho</button><div class="answer">\u2713 ' + escapeHtml(correct) + '</div></div>';
+        }
+        if (!count) return '<p>' + formatAi(text) + '</p>';
+        return out;
+      }
+
       document.getElementById('chatForm').addEventListener('submit', function (event) {
         event.preventDefault();
         var input = document.getElementById('chatInput');
@@ -748,94 +786,112 @@
         typing.innerHTML = '<i></i><i></i><i></i>';
         windowEl.appendChild(typing);
         typing.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        function renderReply(replyText, isLive) {
+        var sysPrompt = 'Tum Sathi AI ho \u2014 ek dostana, madadgar AI helper. User jis zuban mein likhe (Roman Urdu ya English), usi zuban mein jawab do. Jawab saaf, mukhtasar aur seedha rakho.\n\nUser: ' + text;
+        aiText(sysPrompt).then(function (reply) {
           typing.remove();
           var bot = document.createElement('div');
           bot.className = 'bubble bot';
-          var safeReply = escapeHtml(replyText).replace(/\n/g, '<br>');
-          if (document.getElementById('webSearchToggle').checked) safeReply = '<span class="sample-label">TAZA MALOOMAT — DEMO</span><br>' + safeReply;
-          bot.innerHTML = safeReply + '<small>Sathi AI' + (isLive ? '' : ' · Demo') + '</small><button class="listen-btn" type="button" data-listen>▷ Sunno</button>';
+          bot.innerHTML = formatAi(reply) + '<small>Sathi AI \u00b7 Live</small><button class="listen-btn" type="button" data-listen>\u25b7 Sunno</button>';
+          try { bot.setAttribute('data-say', reply); } catch (e) {}
           windowEl.appendChild(bot);
           bot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        var livePrefix = 'Reply in the same language the user writes in (Roman Urdu if they write Roman Urdu). Keep answers short and helpful. User: ';
-        fetch('https://text.pollinations.ai/' + encodeURIComponent(livePrefix + text))
-          .then(function (response) {
-            if (!response.ok) throw new Error('API error ' + response.status);
-            return response.text();
-          })
-          .then(function (aiText) {
-            aiText = (aiText || '').trim();
-            if (!aiText) throw new Error('Empty reply');
-            renderReply(aiText, true);
-          })
-          .catch(function () {
-            renderReply('AI se rabta nahi ho saka, dobara koshish karo.', false);
-          });
+        }).catch(function () {
+          typing.remove();
+          var err = document.createElement('div');
+          err.className = 'bubble bot';
+          err.innerHTML = escapeHtml(AI_ERR) + '<small>Sathi AI</small>';
+          windowEl.appendChild(err);
+          err.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
       });
 
       document.getElementById('chatFile').addEventListener('change', function (event) {
         var file = event.target.files && event.target.files[0];
-        document.getElementById('attachmentName').textContent = file ? '📎 ' + file.name : 'Demo chat';
-        if (file) showToast('File attach ho gayi — demo mein upload nahi hogi');
+        document.getElementById('attachmentName').textContent = file ? '📎 ' + file.name : 'Chat';
+        if (file) showToast('File AI ko nahi bheji jayegi \u2014 ye feature jald aa raha hai');
       });
       document.getElementById('webSearchToggle').addEventListener('change', function (event) {
-        showToast(event.target.checked ? 'Taza maloomat mode on — demo' : 'Taza maloomat mode off');
+        showToast(event.target.checked ? 'Live web search jald aa raha hai \u2014 filhal AI apne ilm se jawab dega' : 'Taza maloomat mode off');
       });
       document.getElementById('micButton').addEventListener('click', function () {
-        if (window.SathiVoice) { SathiVoice.postMessage('start'); return; }
         var button = this;
-        button.classList.add('listening');
-        button.textContent = '●';
-        document.getElementById('chatInput').placeholder = 'Sun raha hoon…';
-        showToast('Voice input demo — bolain');
-        setTimeout(function () {
-          button.classList.remove('listening');
-          button.textContent = '♬';
-          document.getElementById('chatInput').placeholder = 'Sawal likho...';
-          if (!document.getElementById('chatInput').value) document.getElementById('chatInput').value = 'Meri parhai ka plan banao';
-        }, 1600);
+        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { showToast('Is browser mein voice input support nahi'); return; }
+        try {
+          var rec = new SR();
+          rec.lang = 'ur-PK';
+          rec.interimResults = false;
+          rec.maxAlternatives = 1;
+          button.classList.add('listening');
+          button.textContent = '\u25cf';
+          document.getElementById('chatInput').placeholder = 'Sun raha hoon\u2026 bolo';
+          rec.onresult = function (e) {
+            var t = e.results[0][0].transcript;
+            document.getElementById('chatInput').value = t;
+            showToast('Sun liya \u2014 ab send dabao');
+          };
+          rec.onerror = function () { showToast('Awaz samajh nahi aayi, dobara try karo'); };
+          rec.onend = function () {
+            button.classList.remove('listening');
+            button.textContent = '\u266c';
+            document.getElementById('chatInput').placeholder = 'Sawal likho...';
+          };
+          rec.start();
+        } catch (err) { showToast('Mic nahi khul saka'); }
       });
       document.getElementById('chatWindow').addEventListener('click', function (event) {
         var button = event.target.closest('[data-listen]');
         if (!button) return;
-        if (window.SathiTts) {
-          if (button.classList.contains('playing')) {
-            SathiTts.postMessage('__STOP__');
-            button.classList.remove('playing');
-            button.textContent = '▷ Sunno';
-            return;
-          }
-          var bubble = button.closest('.bubble');
-          var clone = bubble ? bubble.cloneNode(true) : null;
-          if (clone) clone.querySelectorAll('button, small').forEach(function (n) { n.remove(); });
-          var text = clone ? clone.textContent.replace(/\s+/g, ' ').trim() : '';
-          if (!text) { showToast('Sunne ke liye koi jawab nahi'); return; }
-          button.classList.add('playing');
-          button.textContent = '◼ Roko';
-          SathiTts.postMessage(text);
+        if (!('speechSynthesis' in window)) { showToast('Is browser mein voice support nahi'); return; }
+        if (button.classList.contains('playing')) {
+          window.speechSynthesis.cancel();
+          button.classList.remove('playing');
+          button.textContent = '\u25b7 Sunno';
           return;
         }
-        button.classList.add('playing');
-        button.textContent = '◼ Sun raha hain…';
-        showToast('Demo voice playback');
-        setTimeout(function () { button.classList.remove('playing'); button.textContent = '▷ Sunno'; }, 1400);
+        var wrap = button.parentElement;
+        var text = (wrap.getAttribute('data-say') || wrap.textContent || '').replace(/\u25b7 Sunno|\u25fc Roko/g, '').trim();
+        if (!text) return;
+        try {
+          var u = new SpeechSynthesisUtterance(text);
+          try {
+            var voices = window.speechSynthesis.getVoices();
+            var v = null;
+            for (var i = 0; i < voices.length; i++) {
+              var lang = (voices[i].lang || '').toLowerCase();
+              if (lang.indexOf('ur') === 0) { v = voices[i]; break; }
+            }
+            if (!v) for (var j = 0; j < voices.length; j++) {
+              var lang2 = (voices[j].lang || '').toLowerCase();
+              if (lang2.indexOf('hi') === 0) { v = voices[j]; break; }
+            }
+            if (v) u.voice = v;
+          } catch (e) {}
+          u.onend = function () { button.classList.remove('playing'); button.textContent = '\u25b7 Sunno'; };
+          u.onerror = function () { button.classList.remove('playing'); button.textContent = '\u25b7 Sunno'; };
+          button.classList.add('playing');
+          button.textContent = '\u25fc Roko';
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(u);
+        } catch (err) { showToast('Voice nahi chal saki'); }
       });
 
       document.getElementById('studyForm').addEventListener('submit', function (event) {
         event.preventDefault();
         var topic = document.getElementById('studyTopic').value.trim();
-        var isPhoto = topic.toLowerCase().indexOf('photo') > -1;
-        var explanation = isPhoto
-          ? 'Photosynthesis woh process hai jisme pauday sunlight, pani aur carbon dioxide ko use karke apni food (glucose) banate hain. Is process mein oxygen hawa mein release hoti hai. Ye zyada tar leaves ke chloroplasts mein hota hai.'
-          : topic + ' ko asaan tareeqe se samajhne ke liye pehle uski basic definition, phir process, aur akhir mein ek real-life example dekhein. Live AI version aapki class ke level ke mutabiq mukammal explanation dega.';
-        var q1 = isPhoto ? 'Plants food banane ke liye kis energy ko use karte hain?' : topic + ' ko samajhne ka pehla qadam kya hai?';
-        var a1 = isPhoto ? 'Sunlight energy' : 'Basic definition ko samajhna';
+        if (!topic) return;
         var result = document.getElementById('studyResult');
-        result.innerHTML = '<div class="result-card"><div class="result-title"><strong>' + escapeHtml(topic) + ' — Simple Explanation</strong></div><p>' + escapeHtml(explanation) + '</p><h3>Yaad rakhne ke points</h3><ul class="bullets"><li>Definition ko ek line mein apne alfaaz mein likho.</li><li>Process ko 3 chhotay steps mein divide karo.</li><li>Ek everyday example ke saath revise karo.</li></ul><h3>Practice MCQs</h3>' +
-          mcq(q1, a1) + mcq('Revision ka behtareen tareeqa kya hai?', 'Active recall aur short practice') + mcq('Mushkil topic ko kaise divide karein?', 'Chhotay, logical steps mein') + '</div>';
+        result.innerHTML = '<div class="result-card">' + aiLoadingHtml('AI "' + topic + '" samjha raha hai\u2026') + '</div>';
         result.classList.add('show');
-        result.querySelectorAll('.reveal').forEach(function (button) { button.addEventListener('click', function () { var ans = button.nextElementSibling; ans.classList.toggle('show'); button.textContent = ans.classList.contains('show') ? 'Answer chupao' : 'Answer dekho'; }); });
+        var explainP = aiText('Explain "' + topic + '" simply for a Pakistani student. Keep it SHORT: one simple definition, then 3 key points as a list. Reply in the same language style the topic is written in (Roman Urdu if the topic is Roman Urdu). No extra intro or outro.');
+        var mcqP = aiText('Create exactly 5 multiple-choice questions about "' + topic + '" for a student. Use EXACTLY this format and nothing else, no extra text:\nQ1: <question>\nA) <option>\nB) <option>\nC) <option>\nD) <option>\nAnswer: <letter>\n\nQ2: <question>\nA) <option>\nB) <option>\nC) <option>\nD) <option>\nAnswer: <letter>\n(continue the same pattern for Q3, Q4, Q5)');
+        Promise.all([explainP, mcqP]).then(function (parts) {
+          result.innerHTML = '<div class="result-card"><div class="result-title"><strong>' + escapeHtml(topic) + ' \u2014 AI Explanation</strong> <span class="live-badge">LIVE</span></div><p>' + formatAi(parts[0]) + '</p><h3>Practice MCQs (AI generated)</h3>' + parseMcqs(parts[1]) + '</div>';
+          result.querySelectorAll('.reveal').forEach(function (button) { button.addEventListener('click', function () { var ans = button.nextElementSibling; ans.classList.toggle('show'); button.textContent = ans.classList.contains('show') ? 'Answer chupao' : 'Answer dekho'; }); });
+          result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }).catch(function () {
+          result.innerHTML = '<div class="result-card"><div class="ai-error">' + escapeHtml(AI_ERR) + '</div></div>';
+        });
       });
       function mcq(question, answer) { return '<div class="mcq"><p>' + escapeHtml(question) + '</p><button type="button" class="reveal">Answer dekho</button><div class="answer">✓ ' + escapeHtml(answer) + '</div></div>'; }
 
@@ -977,25 +1033,39 @@
       document.getElementById('translatorForm').addEventListener('submit', function (event) {
         event.preventDefault();
         var text = document.getElementById('translateText').value.trim();
-        var key = text.toLowerCase().replace(/[.!?]/g, '');
-        var enUr = { 'hello': 'Assalam-o-Alaikum / Hello', 'thank you': 'Shukriya', 'how are you': 'Aap kaise hain?', 'good morning': 'Subah bakhair', 'please': 'Meherbani karke' };
-        var urEn = { 'assalam-o-alaikum': 'Hello / Peace be upon you', 'shukriya': 'Thank you', 'aap kaise hain': 'How are you?', 'subah bakhair': 'Good morning', 'meherbani karke': 'Please' };
-        var map = direction === 'en-ur' ? enUr : urEn;
-        var output = map[key];
-        var isSample = !output;
-        if (!output) output = direction === 'en-ur' ? 'Yeh sirf demo tarjuma hai: “' + text + '” ka live, sahi tarjuma translation service connect hone ke baad milega.' : 'This is a sample only: a live translation service is needed to translate “' + text + '” accurately.';
+        if (!text) return;
         var result = document.getElementById('translateResult');
-        result.innerHTML = '<div class="result-card">' + (isSample ? '<span class="sample-label">SAMPLE — LIVE TRANSLATION NAHI</span>' : '<span class="sample-label">DEMO DICTIONARY MATCH</span>') + '<p>' + escapeHtml(output) + '</p></div>';
+        result.innerHTML = '<div class="result-card">' + aiLoadingHtml('Tarjuma ho raha hai\u2026') + '</div>';
         result.classList.add('show');
+        var target = direction === 'en-ur' ? 'Roman Urdu (Urdu written in Latin/Roman script)' : 'English';
+        aiText('Translate the following text to ' + target + '. Return ONLY the translation, no explanation, no quotation marks, no extra text:\n\n' + text).then(function (out) {
+          result.innerHTML = '<div class="result-card"><span class="live-badge">LIVE</span><p style="margin-top:8px">' + escapeHtml(out) + '</p></div>';
+          result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }).catch(function () {
+          result.innerHTML = '<div class="result-card"><div class="ai-error">' + escapeHtml(AI_ERR) + '</div></div>';
+        });
       });
 
       document.getElementById('imageCreateForm').addEventListener('submit', function (event) {
         event.preventDefault();
         var prompt = document.getElementById('imagePrompt').value.trim();
+        if (!prompt) return;
         var result = document.getElementById('imageCreateResult');
-        result.innerHTML = '<div class="art-preview"><span class="sample-label">SAMPLE AI ART</span><strong>' + escapeHtml(prompt) + '</strong><small>Live version mein yahan aapki generated image nazar aayegi.</small></div>';
+        var seed = Math.floor(Math.random() * 1000000);
+        var url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=768&height=768&nologo=true&seed=' + seed;
+        result.innerHTML = '<div class="art-preview"><span class="live-badge">LIVE</span>' + aiLoadingHtml('Tasveer ban rahi hai\u2026 thora waqt lag sakta hai') + '</div>';
         result.classList.add('show');
         result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        var img = new Image();
+        img.alt = prompt;
+        img.onload = function () {
+          result.innerHTML = '<div class="art-preview"><span class="live-badge">LIVE</span><img class="gen-image" src="' + url + '" alt="AI generated image"><small>' + escapeHtml(prompt) + '</small></div>';
+          result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        };
+        img.onerror = function () {
+          result.innerHTML = '<div class="art-preview"><div class="ai-error">' + escapeHtml(AI_ERR) + '</div></div>';
+        };
+        img.src = url;
       });
 
       document.getElementById('imageUnderstandForm').addEventListener('submit', function (event) {
@@ -1006,7 +1076,7 @@
         var reader = new FileReader();
         reader.onload = function () {
           var result = document.getElementById('imageUnderstandResult');
-          result.innerHTML = '<div class="result-card"><span class="sample-label">SAMPLE TAJZIYA</span><img class="vision-preview" src="' + reader.result + '" alt="Uploaded photo preview"><div class="analysis-row"><b>1</b><p><strong>Manzar</strong><br>Photo successfully read ho gayi. Live AI objects aur scene ko tafseel se pehchanega.</p></div><div class="analysis-row"><b>2</b><p><strong>Matn</strong><br>Agar tasveer mein text hua to live version usay parh aur samjha sakega.</p></div><div class="analysis-row"><b>3</b><p><strong>Sawal</strong><br>Aap is photo ke baare mein follow-up sawal bhi pooch sakenge.</p></div></div>';
+          result.innerHTML = '<div class="result-card"><img class="vision-preview" src="' + reader.result + '" alt="Uploaded photo preview"><div class="ai-error" style="margin-top:10px">\U0001F4F7 Photo mil gayi! Tasveer samajhne wala AI feature <strong>jald aa raha hai</strong> \u2014 abhi AI photo dekh kar tajziya nahi kar sakta. Koi fake tajziya nahi dikhaya jayega.</div></div>';
           result.classList.add('show');
           result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         };
@@ -1017,14 +1087,19 @@
         event.preventDefault();
         var type = document.getElementById('writingType').value;
         var topic = document.getElementById('writingTopic').value.trim();
-        var draft;
-        if (type === 'Email') draft = 'Subject: ' + topic + '\n\nAssalam-o-Alaikum,\n\nMain aap se ' + topic + ' ke silsilay mein rabta kar raha hoon. Meherbani karke jab mumkin ho, rehnumai farma dein.\n\nShukriya.';
-        else if (type === 'Job message') draft = 'Assalam-o-Alaikum, maine ' + topic + ' ka opportunity dekha. Meri relevant skills is role se match karti hain. Agar mumkin ho to main apna CV aur portfolio share karna chahta hoon. Shukriya.';
-        else draft = topic + ' — ek naya idea, behtar tareeqe se. Aap ka kya khayal hai?';
+        if (!topic) return;
         var result = document.getElementById('writingResult');
-        result.innerHTML = '<div class="result-card"><div class="result-title"><strong>' + escapeHtml(type) + ' draft</strong><button type="button" class="btn secondary copy-btn" id="copyWriting">Copy</button></div><p style="white-space:pre-line">' + escapeHtml(draft) + '</p></div>';
+        result.innerHTML = '<div class="result-card">' + aiLoadingHtml('AI likh raha hai\u2026') + '</div>';
         result.classList.add('show');
-        document.getElementById('copyWriting').addEventListener('click', function () { copyText(draft, 'Draft copy ho gaya'); });
+        var task = type === 'Email' ? 'a polite, ready-to-send email (with subject line)' : type === 'Job message' ? 'a short professional job-application message' : 'an engaging social media caption with hashtags';
+        aiText('Write ' + task + ' about: "' + topic + '". Keep it natural, complete and ready to use. Reply in the same language style the topic is written in (Roman Urdu if the topic is Roman Urdu). Return ONLY the draft, no extra commentary.').then(function (draft) {
+          result.innerHTML = '<div class="result-card"><div class="result-title"><strong>' + escapeHtml(type) + ' draft</strong> <span class="live-badge">LIVE</span><button type="button" class="btn secondary copy-btn" id="copyWriting">Copy</button></div><p style="white-space:pre-line">' + escapeHtml(draft) + '</p></div>';
+          result.classList.add('show');
+          document.getElementById('copyWriting').addEventListener('click', function () { copyText(draft, 'Draft copy ho gaya'); });
+          result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }).catch(function () {
+          result.innerHTML = '<div class="result-card"><div class="ai-error">' + escapeHtml(AI_ERR) + '</div></div>';
+        });
       });
 
       document.getElementById('historyList').addEventListener('click', function (event) {
@@ -1048,55 +1123,5 @@
       }
     })();
   </script>
-<script>
-/* Sathi AI native bridge: mic state, input injection, share buttons for AI replies */
-(function () {
-  window.__sathiMicState = function (state) {
-    var b = document.getElementById('micButton');
-    if (!b) return;
-    if (state === 'listening') {
-      b.classList.add('listening');
-      b.textContent = '●';
-      document.getElementById('chatInput').placeholder = 'Sun raha hoon…';
-    } else {
-      b.classList.remove('listening');
-      b.textContent = '♬';
-      document.getElementById('chatInput').placeholder = 'Sawal likho...';
-    }
-  };
-  window.__sathiSetInput = function (text) {
-    var i = document.getElementById('chatInput');
-    if (i) { i.value = text; i.focus(); }
-    if (window.showToast) showToast('Apna sawal check kar ke Bhejo dabain');
-  };
-  function bubbleText(bubble) {
-    var clone = bubble.cloneNode(true);
-    clone.querySelectorAll('button, small').forEach(function (n) { n.remove(); });
-    return (clone.textContent || '').replace(/\s+/g, ' ').trim();
-  }
-  function addShareButtons() {
-    document.querySelectorAll('.bubble.bot').forEach(function (b) {
-      if (b.querySelector('[data-sathi-share]')) return;
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'listen-btn';
-      btn.setAttribute('data-sathi-share', '1');
-      btn.textContent = '⤴ Share';
-      btn.addEventListener('click', function (ev) {
-        ev.stopPropagation();
-        var text = bubbleText(b);
-        if (window.SathiShare && text) SathiShare.postMessage(text);
-        else if (window.showToast) showToast('Share ke liye koi jawab nahi');
-      });
-      b.appendChild(btn);
-    });
-  }
-  addShareButtons();
-  var cw = document.getElementById('chatWindow');
-  if (cw && window.MutationObserver) {
-    new MutationObserver(addShareButtons).observe(cw, { childList: true, subtree: true });
-  }
-})();
-</script>
 </body>
 </html>
