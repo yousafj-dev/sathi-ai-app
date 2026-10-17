@@ -337,6 +337,7 @@
     .web-toggle input:checked + span::after { transform: translateX(13px); }
     .listen-btn { display: block; margin-top: 7px; padding: 4px 7px; border: 0; border-radius: 7px; background: var(--primary-soft); color: var(--primary); font-size: 9px; font-weight: 800; cursor: pointer; }
     .listen-btn.playing { color: var(--success); }
+    .share-btn { display: block; margin-top: 7px; padding: 4px 7px; border: 0; border-radius: 7px; background: var(--primary-soft); color: var(--primary); font-size: 9px; font-weight: 800; cursor: pointer; }
     .bullets { padding-left: 18px; margin: 0; }
     .bullets li { margin: 7px 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
     .mcq { margin-top: 9px; background: var(--surface); border: 1px solid var(--line); padding: 11px; border-radius: 11px; }
@@ -479,9 +480,58 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
+  
+    /* ---- Sathi AI auth gate ---- */
+    .auth-gate { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #2b1a5e, #171225 62%, #0d1b3d); overflow-y: auto; }
+    .auth-gate.hidden { display: none; }
+    .auth-card { width: 100%; max-width: 380px; background: var(--surface-solid, #ffffff); border-radius: 24px; padding: 28px 24px; box-shadow: 0 30px 80px rgba(0,0,0,.35); text-align: center; }
+    .auth-logo { font-size: 26px; font-weight: 800; color: var(--primary, #5530ae); }
+    .auth-sub { color: var(--muted, #655e74); margin: 6px 0 18px; font-size: 14px; }
+    .auth-tabs { display: flex; gap: 8px; margin-bottom: 18px; background: var(--primary-soft, #eee7ff); border-radius: 14px; padding: 4px; }
+    .auth-tab { flex: 1; border: 0; background: transparent; padding: 10px; border-radius: 10px; font-weight: 700; color: var(--muted, #655e74); cursor: pointer; font-size: 14px; }
+    .auth-tab.active { background: var(--surface-solid, #ffffff); color: var(--primary, #5530ae); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .auth-form { display: flex; flex-direction: column; gap: 12px; }
+    .auth-form.hidden { display: none; }
+    .auth-form input { padding: 13px 14px; border: 1.5px solid var(--line, rgba(80,58,126,.14)); border-radius: 12px; font-size: 15px; background: var(--surface-2, #f6f3fc); color: var(--text, #171225); width: 100%; box-sizing: border-box; }
+    .auth-form input:focus { outline: none; border-color: var(--primary, #5530ae); }
+    .auth-btn { padding: 13px; border: 0; border-radius: 12px; background: linear-gradient(135deg, var(--primary, #5530ae), var(--primary-2, #245bbb)); color: #fff; font-weight: 800; font-size: 15px; cursor: pointer; }
+    .auth-btn:disabled { opacity: .6; cursor: wait; }
+    .auth-err { color: #b3261e; font-size: 13px; min-height: 18px; margin: 0; }
+    .auth-note { font-size: 12px; color: var(--muted, #655e74); margin: 4px 0 0; min-height: 16px; }
+    .user-chip { display: flex; align-items: center; gap: 8px; }
+    .user-chip.hidden { display: none; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-bright, #d9a63b), var(--gold, #a86f12)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; }
+    .user-logout { border: 1px solid var(--line, rgba(80,58,126,.14)); background: transparent; color: var(--muted, #655e74); border-radius: 10px; padding: 7px 10px; font-size: 12px; cursor: pointer; }
   </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
+  <div class="auth-gate" id="authGate">
+    <div class="auth-card">
+      <div class="auth-logo">Sathi AI</div>
+      <p class="auth-sub">Aage barhne ke liye pehle account banao ya login karo</p>
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab active" data-authtab="signup">Account banao</button>
+        <button type="button" class="auth-tab" data-authtab="login">Login</button>
+      </div>
+      <form class="auth-form" id="signupForm" autocomplete="on">
+        <input id="suName" type="text" placeholder="Tumhara naam" maxlength="50" autocomplete="name" />
+        <input id="suEmail" type="email" placeholder="Email" autocomplete="email" />
+        <input id="suPass" type="password" placeholder="Password (kam az kam 6 harf)" autocomplete="new-password" />
+        <button class="auth-btn" type="submit" id="suBtn">Account banao</button>
+        <p class="auth-err" id="suErr"></p>
+      </form>
+      <form class="auth-form hidden" id="loginForm" autocomplete="on">
+        <input id="liEmail" type="email" placeholder="Email" autocomplete="email" />
+        <input id="liPass" type="password" placeholder="Password" autocomplete="current-password" />
+        <button class="auth-btn" type="submit" id="liBtn">Login karo</button>
+        <p class="auth-err" id="liErr"></p>
+      </form>
+      <p class="auth-note" id="authNote"></p>
+    </div>
+  </div>
   <main class="app">
     <section class="screen active" id="home" aria-label="Home">
       <header class="hero">
@@ -490,6 +540,10 @@
           <div class="theme-switch" role="group" aria-label="Appearance">
             <button class="theme-btn" type="button" data-theme-choice="light" aria-pressed="false">☀ Day</button>
             <button class="theme-btn" type="button" data-theme-choice="dark" aria-pressed="false">☾ Night</button>
+          </div>
+          <div class="user-chip hidden" id="userChip">
+            <span class="user-avatar" id="userAvatar">?</span>
+            <button class="user-logout" id="logoutBtn" type="button">Logout</button>
           </div>
         </div>
         <h1>Hello friend! Aaj kis kaam mein help chahiye?</h1>
@@ -519,7 +573,7 @@
     <section class="screen" id="chat" aria-label="AI Chat">
       <div class="page-head"><div class="head-icon">💬</div><div><h1>AI Chat</h1><p>Sawal likho, live jawab pao</p></div></div>
       <div class="chat-window" id="chatWindow">
-        <div class="bubble bot" data-say="Hello friend! Main Sathi AI hoon. Aapki parhai, CV aur rozana writing mein help kar sakta hoon.">Hello friend! Main Sathi AI hoon — aapki parhai, CV aur rozana writing mein help kar sakta hoon.<small>Sathi AI · Live</small><button class="listen-btn" type="button" data-listen>▷ Sunno</button></div>
+        <div class="bubble bot" data-say="Hello friend! Main Sathi AI hoon. Aapki parhai, CV aur rozana writing mein help kar sakta hoon.">Hello friend! Main Sathi AI hoon — aapki parhai, CV aur rozana writing mein help kar sakta hoon.<small>Sathi AI · Live</small><button class="listen-btn" type="button" data-listen>▷ Sunno</button><button class="share-btn" type="button" data-share>⤴ Share</button></div>
       </div>
       <form class="chat-compose" id="chatForm">
         <div class="chat-options">
@@ -791,7 +845,7 @@
           typing.remove();
           var bot = document.createElement('div');
           bot.className = 'bubble bot';
-          bot.innerHTML = formatAi(reply) + '<small>Sathi AI \u00b7 Live</small><button class="listen-btn" type="button" data-listen>\u25b7 Sunno</button>';
+          bot.innerHTML = formatAi(reply) + '<small>Sathi AI \u00b7 Live</small><button class="listen-btn" type="button" data-listen>\u25b7 Sunno</button><button class="share-btn" type="button" data-share>\u2934 Share</button>';
           try { bot.setAttribute('data-say', reply); } catch (e) {}
           windowEl.appendChild(bot);
           bot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -814,6 +868,7 @@
         showToast(event.target.checked ? 'Live web search jald aa raha hai \u2014 filhal AI apne ilm se jawab dega' : 'Taza maloomat mode off');
       });
       document.getElementById('micButton').addEventListener('click', function () {
+        if (window.SathiVoice) { try { window.SathiVoice.postMessage('start'); } catch (e) {} return; }
         var button = this;
         var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) { showToast('Is browser mein voice input support nahi'); return; }
@@ -840,8 +895,33 @@
         } catch (err) { showToast('Mic nahi khul saka'); }
       });
       document.getElementById('chatWindow').addEventListener('click', function (event) {
+        var sbtn = event.target.closest('[data-share]');
+        if (sbtn) {
+          var swrap = sbtn.parentElement;
+          var stext = (swrap.getAttribute('data-say') || swrap.textContent || '').replace(/\u25b7 Sunno|\u25fc Roko|\u2934 Share/g, '').trim();
+          if (stext) {
+            if (window.SathiShare) { try { window.SathiShare.postMessage(stext); } catch (e) {} }
+            else if (navigator.share) { navigator.share({ text: stext }).catch(function () {}); }
+            else showToast('Share support nahi');
+          }
+          return;
+        }
         var button = event.target.closest('[data-listen]');
         if (!button) return;
+        if (window.SathiTts) {
+          try {
+            if (button.classList.contains('playing')) {
+              window.SathiTts.postMessage('__STOP__');
+              button.classList.remove('playing');
+              button.textContent = '\u25b7 Sunno';
+              return;
+            }
+            var twrap = button.parentElement;
+            var ttext = (twrap.getAttribute('data-say') || twrap.textContent || '').replace(/\u25b7 Sunno|\u25fc Roko|\u2934 Share/g, '').trim();
+            if (ttext) { window.SathiTts.postMessage(ttext); button.classList.add('playing'); button.textContent = '\u25fc Roko'; }
+          } catch (e) {}
+          return;
+        }
         if (!('speechSynthesis' in window)) { showToast('Is browser mein voice support nahi'); return; }
         if (button.classList.contains('playing')) {
           window.speechSynthesis.cancel();
@@ -1123,5 +1203,147 @@
       }
     })();
   </script>
+<script>
+  (function () {
+    'use strict';
+    var gate = document.getElementById('authGate');
+    var note = document.getElementById('authNote');
+    var suForm = document.getElementById('signupForm');
+    var liForm = document.getElementById('loginForm');
+    var suErr = document.getElementById('suErr');
+    var liErr = document.getElementById('liErr');
+    var suBtn = document.getElementById('suBtn');
+    var liBtn = document.getElementById('liBtn');
+    var chip = document.getElementById('userChip');
+    var avatar = document.getElementById('userAvatar');
+
+    function setNote(t) { if (note) note.textContent = t || ''; }
+
+    if (typeof firebase === 'undefined') {
+      setNote('Firebase load nahi ho saka — internet check karo aur page refresh karo.');
+      return;
+    }
+
+    var firebaseConfig = {
+      apiKey: "AIzaSyAwD-dF5rY_ULv9e-7uLhQKAMGQ78c93EA",
+      authDomain: "quizistan-academy.firebaseapp.com",
+      projectId: "quizistan-academy",
+      storageBucket: "quizistan-academy.firebasestorage.app",
+      messagingSenderId: "606589084724",
+      appId: "1:606589084724:web:7ab93e8b60b09713deb5661"
+    };
+    try { firebase.initializeApp(firebaseConfig); }
+    catch (e) { /* already initialized */ }
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+    try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
+
+    // Tab switching
+    var tabs = document.querySelectorAll('[data-authtab]');
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        var which = tab.getAttribute('data-authtab');
+        suForm.classList.toggle('hidden', which !== 'signup');
+        liForm.classList.toggle('hidden', which !== 'login');
+        suErr.textContent = ''; liErr.textContent = '';
+      });
+    });
+
+    function mapErr(err) {
+      var c = err && err.code;
+      if (c === 'auth/email-already-in-use') return 'ye email pehle se registered hai — Login karo';
+      if (c === 'auth/wrong-password') return 'password ghalat hai';
+      if (c === 'auth/weak-password') return 'password kam az kam 6 harf ka ho';
+      if (c === 'auth/user-not-found') return 'is email ka account nahi mila — pehle Account banao';
+      if (c === 'auth/invalid-email') return 'sahi email likho';
+      if (c === 'auth/invalid-credential') return 'email ya password ghalat hai';
+      if (c === 'auth/network-request-failed') return 'internet check karo aur dobara try karo';
+      if (c === 'auth/operation-not-allowed') return 'login system abhi tayyar ho raha hai — thodi der baad try karo';
+      if (c === 'auth/too-many-requests') return 'bohat zyada koshishen — thodi der baad try karo';
+      return 'kuch ghalat ho gaya — dobara try karo';
+    }
+
+    function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    suForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var name = document.getElementById('suName').value.trim();
+      var email = document.getElementById('suEmail').value.trim();
+      var pass = document.getElementById('suPass').value;
+      suErr.textContent = '';
+      if (name.length < 2) { suErr.textContent = 'apna naam likho'; return; }
+      if (!validEmail(email)) { suErr.textContent = 'sahi email likho'; return; }
+      if (pass.length < 6) { suErr.textContent = 'password kam az kam 6 harf ka ho'; return; }
+      suBtn.disabled = true; suBtn.textContent = 'Ruko...';
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then(function (cred) {
+          var u = cred.user;
+          var p1 = u.updateProfile({ displayName: name });
+          var p2 = db.collection('users').doc(u.uid).set({
+            name: name,
+            email: email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+          return Promise.all([p1, p2]);
+        })
+        .then(function () { /* onAuthStateChanged hides the gate */ })
+        .catch(function (err) {
+          suErr.textContent = mapErr(err);
+        })
+        .then(function () { suBtn.disabled = false; suBtn.textContent = 'Account banao'; });
+    });
+
+    liForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var email = document.getElementById('liEmail').value.trim();
+      var pass = document.getElementById('liPass').value;
+      liErr.textContent = '';
+      if (!validEmail(email)) { liErr.textContent = 'sahi email likho'; return; }
+      if (!pass) { liErr.textContent = 'password likho'; return; }
+      liBtn.disabled = true; liBtn.textContent = 'Ruko...';
+      auth.signInWithEmailAndPassword(email, pass)
+        .catch(function (err) {
+          liErr.textContent = mapErr(err);
+        })
+        .then(function () { liBtn.disabled = false; liBtn.textContent = 'Login karo'; });
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+      auth.signOut();
+    });
+
+    auth.onAuthStateChanged(function (user) {
+      if (user) {
+        gate.classList.add('hidden');
+        var label = user.displayName || user.email || '?';
+        avatar.textContent = label.trim().charAt(0).toUpperCase();
+        avatar.title = label;
+        chip.classList.remove('hidden');
+      } else {
+        gate.classList.remove('hidden');
+        chip.classList.add('hidden');
+      }
+    });
+  })();
+</script>
+<script>
+// Native Android bridge - used by the Sathi AI app WebView channels; harmless on web
+window.__sathiSetInput = function (t) {
+  var i = document.getElementById('chatInput');
+  if (i) i.value = t || '';
+  if (typeof showToast === 'function') showToast('Sun liya \u2014 ab send dabao');
+};
+window.__sathiMicState = function (s) {
+  var b = document.getElementById('micButton');
+  if (b) {
+    if (s === 'listening') { b.classList.add('listening'); b.textContent = '\u25cf'; }
+    else { b.classList.remove('listening'); b.textContent = '\u266c'; }
+  }
+  var ph = document.getElementById('chatInput');
+  if (ph) ph.placeholder = s === 'listening' ? 'Sun raha hoon\u2026 bolo' : 'Sawal likho...';
+};
+</script>
 </body>
 </html>
