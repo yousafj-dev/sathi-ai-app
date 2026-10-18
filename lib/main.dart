@@ -234,9 +234,42 @@ class _SathiWebViewState extends State<SathiWebView> {
   Future<void> _initTts() async {
     await _tts.setSpeechRate(0.95);
     try {
-      await _tts.setLanguage('ur-PK');
+      await _tts.setPitch(1.0);
+    } catch (_) {}
+    // Pick the clearest available voice: Urdu (Google first), else English (Google first).
+    try {
+      final dynamic rawVoices = await _tts.getVoices;
+      final List<dynamic> voices = rawVoices is List ? rawVoices : <dynamic>[];
+      String localeOf(Map m) =>
+          (m['locale'] ?? m['lang'] ?? '').toString().toLowerCase();
+      String nameOf(Map m) => (m['name'] ?? '').toString().toLowerCase();
+      bool isUrdu(Map m) => localeOf(m).startsWith('ur');
+      bool isEnglish(Map m) => localeOf(m).startsWith('en');
+      bool isGoogle(Map m) => nameOf(m).contains('google');
+      Map<String, String>? firstWhere(bool Function(Map) test) {
+        for (final v in voices) {
+          if (v is Map && test(v)) {
+            return {
+              'name': (v['name'] ?? '').toString(),
+              'locale': (v['locale'] ?? v['lang'] ?? '').toString(),
+            };
+          }
+        }
+        return null;
+      }
+      final pick = firstWhere((m) => isUrdu(m) && isGoogle(m)) ??
+          firstWhere(isUrdu) ??
+          firstWhere((m) => isEnglish(m) && isGoogle(m)) ??
+          firstWhere(isEnglish);
+      if (pick != null) {
+        await _tts.setVoice(pick);
+      } else {
+        await _tts.setLanguage('ur-PK');
+      }
     } catch (_) {
-      // Device par Urdu voice na ho to default voice use hogi.
+      try {
+        await _tts.setLanguage('ur-PK');
+      } catch (_) {}
     }
     _tts.setCompletionHandler(() {
       _controller.runJavaScript(
@@ -246,6 +279,8 @@ class _SathiWebViewState extends State<SathiWebView> {
     });
   }
 
+  DateTime? _lastTtsSpeakAt;
+
   Future<void> _onTtsMessage(JavaScriptMessage message) async {
     final text = message.message;
     if (text == '__STOP__') {
@@ -253,6 +288,13 @@ class _SathiWebViewState extends State<SathiWebView> {
       return;
     }
     if (text.trim().isEmpty) return;
+    // Debounce: ignore accidental double-taps within 400ms to avoid overlap.
+    final now = DateTime.now();
+    if (_lastTtsSpeakAt != null &&
+        now.difference(_lastTtsSpeakAt!).inMilliseconds < 400) {
+      return;
+    }
+    _lastTtsSpeakAt = now;
     await _tts.stop();
     await _tts.speak(text);
   }
