@@ -232,7 +232,7 @@ class _SathiWebViewState extends State<SathiWebView> {
   // ---------------- Listen to replies (native TTS) ----------------
 
   Future<void> _initTts() async {
-    await _tts.setSpeechRate(0.95);
+    await _tts.setSpeechRate(1.0);
     try {
       await _tts.setPitch(1.0);
     } catch (_) {}
