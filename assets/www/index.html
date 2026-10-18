@@ -507,6 +507,20 @@
 #chatInput{min-height:52px;font-size:16px;padding:12px 14px;border-radius:14px}
 #micButton{width:56px;height:56px;min-width:56px;border-radius:50%;font-size:24px;line-height:1;background:linear-gradient(135deg,#7c5cff,#00c8ff);border:none;color:#fff;box-shadow:0 4px 14px rgba(124,92,255,.45)}
 #micButton.listening{background:#a32c45;box-shadow:0 0 0 6px rgba(163,44,69,.25)}
+
+/* Dashboard */
+.dash-wrap { display: flex; flex-direction: column; gap: 14px; }
+.dash-profile { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.dash-avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-bright), var(--primary)); color: #fff; font-size: 24px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dash-name { font-weight: 800; font-size: 17px; }
+.dash-email { color: var(--muted); font-size: 13px; word-break: break-all; }
+.dash-since { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.dash-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 8px; text-align: center; }
+.stat-num { display: block; font-size: 28px; font-weight: 800; color: var(--primary); }
+.stat-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+.dash-note { text-align: center; color: var(--muted); font-size: 13px; margin: 0; }
+
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -702,35 +716,21 @@
       </div>
     </section>
 
-    <footer class="site-footer">
-      <div class="footer-brand-row">
-        <img class="brand-mark" src="logo.webp" alt="" width="36" height="36" />
-        <span class="footer-brand-name">Sathi <b>AI</b></span>
-      </div>
-      <p class="footer-tagline">Aapka personal AI sathi — parhai, CV, writing aur rozana ke kaam, sab ek hi jagah.</p>
-      <div class="footer-grid">
-        <div class="footer-col">
-          <h4>Contact</h4>
-          <a class="footer-contact" href="mailto:yousafjanii028@gmail.com"><span class="footer-contact-icon">✉</span><span>yousafjanii028@gmail.com</span></a>
-          <a class="footer-contact" href="tel:+923176528688"><span class="footer-contact-icon">☎</span><span>+92 317 6528688</span></a>
+    <section class="screen" id="dashboard" aria-label="Dashboard">
+      <div class="page-head"><div class="head-icon">👤</div><div><h1>Dashboard</h1><p>Aapka account aur istemal</p></div></div>
+      <div class="dash-wrap">
+        <div class="dash-profile" id="dashProfile"><p class="dash-note">Load ho raha hai…</p></div>
+        <div class="dash-stats">
+          <div class="stat-card"><span class="stat-num" id="statChatsToday">0</span><span class="stat-label">Aaj ke chats</span></div>
+          <div class="stat-card"><span class="stat-num" id="statImagesToday">0</span><span class="stat-label">Aaj ki tasveerain</span></div>
+          <div class="stat-card"><span class="stat-num" id="statTotalChats">0</span><span class="stat-label">Total chats</span></div>
+          <div class="stat-card"><span class="stat-num" id="statTotalImages">0</span><span class="stat-label">Total tasveerain</span></div>
         </div>
-        <div class="footer-col">
-          <h4>Quick Links</h4>
-          <button class="footer-link" type="button" data-open-tab="home">Features</button>
-          <button class="footer-link" type="button" data-open-tab="pricing">Pricing</button>
-          <button class="footer-link" type="button" data-open-tab="home">About</button>
-        </div>
+        <p class="dash-note">Har kamyab AI jawab aur tasveer yahan gini jati hai.</p>
       </div>
-      <div class="footer-col footer-roadmap">
-        <h4>Future Plans</h4>
-        <ul class="roadmap-list">
-          <li><span>Voice Assistant</span><span class="soon-chip">JALD</span></li>
-          <li><span>WhatsApp Integration</span><span class="soon-chip">JALD</span></li>
-          <li><span>iOS App</span><span class="soon-chip">JALD AA RAHA HAI</span></li>
-        </ul>
-      </div>
-      <div class="footer-bottom">© 2026 Sathi AI. All rights reserved.</div>
-    </footer>
+    </section>
+
+    
 
     <nav class="bottom-nav" aria-label="Main navigation">
       <button class="nav-btn active" data-tab="home"><span class="nav-icon">⌂</span><span>Home</span></button>
@@ -738,6 +738,7 @@
       <button class="nav-btn" data-tab="tools"><span class="nav-icon">🧰</span><span>Tools</span></button>
       <button class="nav-btn" data-tab="history"><span class="nav-icon">🕘</span><span>History</span></button>
       <button class="nav-btn" data-tab="pricing"><span class="nav-icon">◆</span><span>Pricing</span></button>
+      <button class="nav-btn" data-tab="dashboard"><span class="nav-icon">👤</span><span>Dashboard</span></button>
     </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </main>
@@ -781,6 +782,7 @@
         screens.forEach(function (screen) { screen.classList.toggle('active', screen.id === id); });
         navButtons.forEach(function (btn) { btn.classList.toggle('active', btn.dataset.tab === id); });
         if (id === 'tools') showToolsMenu();
+        if (id === 'dashboard' && window.loadDashboard) window.loadDashboard();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
@@ -836,7 +838,7 @@
             throw err;
           });
         }
-        return attempt(1);
+        return attempt(1).then(function (t) { try { window.trackUsage('chat'); } catch (e) {} return t; });
       }
       function formatAi(text) {
         var h = escapeHtml(text);
@@ -1176,6 +1178,7 @@
         var img = new Image();
         img.alt = prompt;
         img.onload = function () {
+          try { window.trackUsage('image'); } catch (e) {}
           result.innerHTML = '<div class="art-preview"><span class="live-badge">LIVE</span><img class="gen-image" src="' + url + '" alt="AI generated image"><small>' + escapeHtml(prompt) + '</small></div>';
           result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         };
@@ -1273,6 +1276,7 @@
     catch (e) { /* already initialized */ }
     var auth = firebase.auth();
     var db = firebase.firestore();
+    window.sathiAuth = auth; window.sathiDb = db;
     try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
 
     // Tab switching
@@ -1381,6 +1385,73 @@ window.__sathiMicState = function (s) {
   var ph = document.getElementById('chatInput');
   if (ph) ph.placeholder = s === 'listening' ? 'Sun raha hoon\u2026 bolo' : 'Sawal likho...';
 };
+</script>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function todayStr() { return new Date().toISOString().slice(0, 10); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  window.trackUsage = function (type) {
+    try {
+      var auth = window.sathiAuth, db = window.sathiDb;
+      if (!auth || !db || !auth.currentUser) return;
+      var uid = auth.currentUser.uid;
+      var today = todayStr();
+      var ref = db.collection('usage').doc(uid);
+      ref.get().then(function (snap) {
+        var d = snap.exists ? snap.data() : {};
+        var fresh = (d.date !== today);
+        var upd = {
+          date: today,
+          chatsToday: (fresh ? 0 : (d.chatsToday || 0)) + (type === 'chat' ? 1 : 0),
+          imagesToday: (fresh ? 0 : (d.imagesToday || 0)) + (type === 'image' ? 1 : 0),
+          totalChats: (d.totalChats || 0) + (type === 'chat' ? 1 : 0),
+          totalImages: (d.totalImages || 0) + (type === 'image' ? 1 : 0)
+        };
+        ref.set(upd, { merge: true }).catch(function () {});
+      }).catch(function () {});
+    } catch (e) {}
+  };
+
+  window.loadDashboard = function () {
+    var prof = $('dashProfile');
+    if (!prof) return;
+    var auth = window.sathiAuth, db = window.sathiDb;
+    function setStats(ct, it, tc, ti) {
+      var a = $('statChatsToday'), b = $('statImagesToday'), c = $('statTotalChats'), d = $('statTotalImages');
+      if (a) a.textContent = ct; if (b) b.textContent = it; if (c) c.textContent = tc; if (d) d.textContent = ti;
+    }
+    if (!auth || !auth.currentUser) {
+      prof.innerHTML = '<p class="dash-note">Dashboard dekhne ke liye pehle login karo.</p>';
+      setStats(0, 0, 0, 0);
+      return;
+    }
+    var u = auth.currentUser;
+    var nm = u.displayName || 'Dost';
+    var em = u.email || '';
+    var av = esc((nm.trim().charAt(0) || '?').toUpperCase());
+    function renderProfile(since) {
+      prof.innerHTML = '<div class="dash-avatar">' + av + '</div><div><div class="dash-name">' + esc(nm) + '</div>' +
+        (em ? '<div class="dash-email">' + esc(em) + '</div>' : '') +
+        '<div class="dash-since">Member since: ' + esc(since) + '</div></div>';
+    }
+    db.collection('users').doc(u.uid).get().then(function (snap) {
+      var since = '—';
+      try {
+        var cd = snap.exists && snap.data().createdAt;
+        if (cd && cd.toDate) since = cd.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      } catch (e) {}
+      renderProfile(since);
+    }).catch(function () { renderProfile('—'); });
+    db.collection('usage').doc(u.uid).get().then(function (snap) {
+      var d = snap.exists ? snap.data() : {};
+      var fresh = (d.date !== todayStr());
+      setStats(fresh ? 0 : (d.chatsToday || 0), fresh ? 0 : (d.imagesToday || 0), d.totalChats || 0, d.totalImages || 0);
+    }).catch(function () { setStats(0, 0, 0, 0); });
+  };
+})();
 </script>
 </body>
 </html>
