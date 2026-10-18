@@ -801,9 +801,42 @@
 
       var AI_ERR = 'AI se rabta nahi ho saka, dobara koshish karo.';
       function aiText(prompt) {
-        return fetch('https://text.pollinations.ai/' + encodeURIComponent(prompt), { cache: 'no-store' })
-          .then(function (res) { if (!res.ok) throw new Error('ai-http'); return res.text(); })
-          .then(function (t) { t = (t || '').trim(); if (!t) throw new Error('ai-empty'); return t; });
+        // Retry + timeout: free AI kabhi rate-limit ya slow net par fail ho jata hai.
+        // 3 koshish, har koshish 45 second timeout, darmiyan me waqfa.
+        var url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt);
+        var MAX_TRIES = 3, TIMEOUT_MS = 45000;
+        function once() {
+          var ctrl = null, timer = null;
+          try {
+            if ('AbortController' in window) {
+              ctrl = new AbortController();
+              timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, TIMEOUT_MS);
+            }
+          } catch (e) {}
+          var opts = { cache: 'no-store' };
+          if (ctrl) opts.signal = ctrl.signal;
+          return fetch(url, opts).then(function (res) {
+            if (timer) clearTimeout(timer);
+            if (!res.ok) throw new Error('ai-http-' + res.status);
+            return res.text();
+          }).then(function (t) {
+            t = (t || '').trim();
+            if (!t) throw new Error('ai-empty');
+            return t;
+          }).catch(function (err) {
+            if (timer) clearTimeout(timer);
+            throw err;
+          });
+        }
+        function attempt(n) {
+          return once().catch(function (err) {
+            if (n < MAX_TRIES) {
+              return new Promise(function (r) { setTimeout(r, 2000 * n); }).then(function () { return attempt(n + 1); });
+            }
+            throw err;
+          });
+        }
+        return attempt(1);
       }
       function formatAi(text) {
         var h = escapeHtml(text);
